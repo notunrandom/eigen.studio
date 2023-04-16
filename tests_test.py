@@ -1,5 +1,6 @@
-from tests import run
 from tests import Result
+from tests import run
+from tests import run_suite
 
 import random
 
@@ -37,3 +38,9 @@ def test_two_args():
     assert run(sum, [x, y, ok]) == Result.PASS
     assert run(sum, [x, y, ko]) == (Result.FAIL, ko, ok)
 
+def test_run_suite():
+    suite = [[1, 2, 3], [12, -5, 7], [30, 0, 30]]
+    assert run_suite(sum, suite) == 3 * [Result.PASS]
+    suite[1] = [12, 5, 7]
+    expected = [Result.PASS, (Result.FAIL, 7, 17), Result.PASS]
+    assert run_suite(sum, suite) == expected

@@ -13,3 +13,6 @@ def run(function, data):
         return Result.PASS
     else:
         return (Result.FAIL, expected, result)
+
+def run_suite(function, suite):
+    return [run(function, data) for data in suite]
