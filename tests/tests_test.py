@@ -1,6 +1,7 @@
 from eigen.tests import Result
 from eigen.tests import run
 from eigen.tests import run_suite
+from eigen.tests import from_hmdna_zip
 
 import random
 
@@ -44,3 +45,12 @@ def test_run_suite():
     suite[1] = [12, 5, 7]
     expected = [Result.PASS, (Result.FAIL, 7, 17), Result.PASS]
     assert run_suite(sum, suite) == expected
+
+def test_from_hmdna_zip():
+    (name, tests) = from_hmdna_zip("tests/FooBar.zip")
+    assert name == "FooBar"
+    assert len(tests) == 3
+    assert tests[0] == ['yohoho', 3, 'o']
+    assert tests[1] == ['yohoho', 2, 'oh']
+    assert tests[2] == ['and a bottle', 2, 'at']
+
