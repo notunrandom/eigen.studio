@@ -1,6 +1,6 @@
-from tests import Result
-from tests import run
-from tests import run_suite
+from eigen.tests import Result
+from eigen.tests import run
+from eigen.tests import run_suite
 
 import random
 
