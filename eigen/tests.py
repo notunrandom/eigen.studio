@@ -11,7 +11,7 @@ def from_hmdna_zip(path):
     tests = []
     with ZipFile(path) as zfile:
         contents = zfile.namelist()
-        files = [f for f in contents if f.count('/inputs/input_') == 1]
+        files = [f for f in contents if '/inputs/input_' in f]
         files.sort()
         for f in files:
             test = []
