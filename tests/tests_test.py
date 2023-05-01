@@ -54,3 +54,11 @@ def test_from_hmdna_zip():
     assert tests[1] == ['yohoho', 2, 'oh']
     assert tests[2] == ['and a bottle', 2, 'at']
 
+def test_from_hmdna_bad_zip():
+    '''Some HMDNA zip files have top directory named differently from zip file.'''
+    (name1, tests1) = from_hmdna_zip("tests/FooBar.zip")
+    (name2, tests2) = from_hmdna_zip("tests/BarBaz.zip")
+    assert name1 == 'FooBar'
+    assert name2 == 'BarBaz'
+    assert tests2 == tests1
+
