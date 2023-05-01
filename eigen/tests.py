@@ -3,6 +3,7 @@ from functools import partial
 from pathlib import PurePath
 from zipfile import ZipFile
 from zipfile import Path
+import timeit
 
 def from_hmdna_zip(path):
     path = PurePath(path)
@@ -43,3 +44,13 @@ def run(function, data):
 
 def run_suite(function, suite):
     return [run(function, data) for data in suite]
+
+def time_suite(function, suite):
+    result = run_suite(function, suite)
+    if result == len(suite) * [True]:
+        n, s = timeit.Timer(lambda: run_suite(function, suite)).autorange()
+        return (True, s/n)
+    else:
+        return (False, result)
+
+    

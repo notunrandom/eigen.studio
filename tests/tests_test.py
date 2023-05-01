@@ -1,5 +1,6 @@
 from eigen.tests import run
 from eigen.tests import run_suite
+from eigen.tests import time_suite
 from eigen.tests import from_hmdna_zip
 
 import random
@@ -60,3 +61,28 @@ def test_from_hmdna_bad_zip():
     assert name1 == 'FooBar'
     assert name2 == 'BarBaz'
     assert tests2 == tests1
+
+def fut1(xs):
+    return list(reversed(xs))
+
+def fut2(xs):
+    rev = list(reversed(xs))
+    inc = [x + 1 for x in rev] 
+    inc.reverse()
+    dec = [x - 1 for x in inc]
+    return list(reversed(dec))
+
+def fut3(xs):
+    return xs
+
+def test_time_suite():
+    suite = [[[1], [1]], [[1, 2, 3], [3, 2, 1]], [list(range(1, 1000)), list(range(999, 0, -1))]]
+    res, time1 = time_suite(fut1, suite)
+    assert res == True
+    res, time2 = time_suite(fut2, suite)
+    assert res == True
+    assert time2 > 2*time1
+    res, errors = time_suite(fut3, suite)
+    assert res == False
+    assert errors == run_suite(fut3, suite)
+
