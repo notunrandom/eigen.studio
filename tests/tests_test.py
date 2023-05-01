@@ -1,4 +1,3 @@
-from eigen.tests import Result
 from eigen.tests import run
 from eigen.tests import run_suite
 from eigen.tests import from_hmdna_zip
@@ -15,8 +14,8 @@ def constant():
     return key
 
 def test_zero_args():
-    assert run(constant, [key]) == Result.PASS
-    assert run(constant, [yek]) == (Result.FAIL, yek, key)
+    assert run(constant, [key]) == True
+    assert run(constant, [yek]) == (False, yek, key)
 
 def add_one(x):
     return x + 1
@@ -25,8 +24,8 @@ def test_one_arg():
     x = randint()
     y = x + 1
     z = x - 1
-    assert run(add_one, [x, y]) == Result.PASS
-    assert run(add_one, [x, z]) == (Result.FAIL, z, y)
+    assert run(add_one, [x, y]) == True
+    assert run(add_one, [x, z]) == (False, z, y)
 
 def sum(x, y):
     return x + y
@@ -36,14 +35,14 @@ def test_two_args():
     y = randint()
     ok = x + y
     ko = x + y + 1
-    assert run(sum, [x, y, ok]) == Result.PASS
-    assert run(sum, [x, y, ko]) == (Result.FAIL, ko, ok)
+    assert run(sum, [x, y, ok]) == True
+    assert run(sum, [x, y, ko]) == (False, ko, ok)
 
 def test_run_suite():
     suite = [[1, 2, 3], [12, -5, 7], [30, 0, 30]]
-    assert run_suite(sum, suite) == 3 * [Result.PASS]
+    assert run_suite(sum, suite) == 3 * [True]
     suite[1] = [12, 5, 7]
-    expected = [Result.PASS, (Result.FAIL, 7, 17), Result.PASS]
+    expected = [True, (False, 7, 17), True]
     assert run_suite(sum, suite) == expected
 
 def test_from_hmdna_zip():
@@ -61,4 +60,3 @@ def test_from_hmdna_bad_zip():
     assert name1 == 'FooBar'
     assert name2 == 'BarBaz'
     assert tests2 == tests1
-

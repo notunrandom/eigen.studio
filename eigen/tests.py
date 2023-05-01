@@ -4,8 +4,6 @@ from pathlib import PurePath
 from zipfile import ZipFile
 from zipfile import Path
 
-Result = Enum('Result', ['PASS', 'FAIL'])
-
 def from_hmdna_zip(path):
     path = PurePath(path)
     tests = []
@@ -39,9 +37,9 @@ def run(function, data):
         f = partial(f, arg)
     result = f()
     if result == expected:
-        return Result.PASS
+        return True
     else:
-        return (Result.FAIL, expected, result)
+        return (False, expected, result)
 
 def run_suite(function, suite):
     return [run(function, data) for data in suite]
