@@ -1,9 +1,8 @@
-from enum import Enum
 from functools import partial
 from pathlib import PurePath
 from zipfile import ZipFile
-from zipfile import Path
 import timeit
+
 
 def from_hmdna_zip(path):
     path = PurePath(path)
@@ -25,11 +24,13 @@ def from_hmdna_zip(path):
             tests.append(_convert(test))
     return (path.stem, tests)
 
+
 def _convert(data):
     for i in range(len(data)):
         if data[i].isdigit():
             data[i] = int(data[i])
     return data
+
 
 def run(function, data):
     f = function
@@ -42,8 +43,10 @@ def run(function, data):
     else:
         return (False, expected, result)
 
+
 def run_suite(function, suite):
     return [run(function, data) for data in suite]
+
 
 def time_suite(function, suite):
     result = run_suite(function, suite)
@@ -52,5 +55,3 @@ def time_suite(function, suite):
         return (True, s/n)
     else:
         return (False, result)
-
-    
