@@ -4,7 +4,27 @@ from zipfile import ZipFile
 import timeit
 
 
-def from_hmdna_zip(path):
+def apply_function(function, values):
+    f = function
+    *args, value = values
+    for arg in args:
+        f = partial(f, arg)
+    return args + [f()]
+
+
+def differences(function, table):
+    image = [apply_function(function, values) for values in table]
+    return [values for values in image if values not in table]
+
+
+def mean_time(function, table):
+    def ensure_no_differences():
+        assert differences(function, table) == []
+    n, s = timeit.Timer(ensure_no_differences).autorange()
+    return s/n
+
+
+def value_table_from_HMDNA_zip(path):
     path = PurePath(path)
     tests = []
     with ZipFile(path) as zfile:
@@ -30,28 +50,3 @@ def _convert(data):
         if data[i].isdigit():
             data[i] = int(data[i])
     return data
-
-
-def run(function, data):
-    f = function
-    *args, expected = data
-    for arg in args:
-        f = partial(f, arg)
-    result = f()
-    if result == expected:
-        return True
-    else:
-        return (False, expected, result)
-
-
-def run_suite(function, suite):
-    return [run(function, data) for data in suite]
-
-
-def time_suite(function, suite):
-    result = run_suite(function, suite)
-    if result == len(suite) * [True]:
-        n, s = timeit.Timer(lambda: run_suite(function, suite)).autorange()
-        return (True, s/n)
-    else:
-        return (False, result)
