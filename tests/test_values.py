@@ -6,6 +6,7 @@ from eigen.values import differences
 from eigen.values import mean_time
 from eigen.values import value_table_from_HMDNA_zip
 from eigen.values import print_differences
+from eigen.values import infer
 
 
 def randint():
@@ -138,3 +139,13 @@ def test_mean_time():
     assert time2 > 2*time1
     with pytest.raises(Exception):
         _ = mean_time(fut3, table)
+
+
+def test_infer():
+    tests = [['ab', 'ab'],
+             ['1', 1],
+             ['1.0', 1.0]]
+
+    for inp, out in tests:
+        result = infer(inp)
+        assert result == out and type(result) == type(out)

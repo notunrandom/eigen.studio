@@ -2,6 +2,7 @@ from functools import partial
 from pathlib import PurePath
 from zipfile import ZipFile
 import timeit
+from enum import Enum
 
 
 def apply_function(function, values):
@@ -69,3 +70,40 @@ def _convert(data):
         if data[i].isdigit():
             data[i] = int(data[i])
     return data
+
+
+def infer(string):
+    parse = _parser(_tokens(string))
+    return parse(string)
+
+
+_Token = Enum('_Token', ['DIGIT', 'ALPHA', 'DOT'])
+
+
+def _tokens(string):
+    seen = set()
+    tokens = list()
+    for c in string:
+        if c.isdigit():
+            _append_if_first(seen, tokens, _Token.DIGIT)
+        elif c == '.':
+            _append_if_first(seen, tokens, _Token.DOT)
+        elif c.isalpha():
+            _append_if_first(seen, tokens, _Token.ALPHA)
+    return tokens
+
+
+def _append_if_first(seen, tokens, token):
+    if token not in seen:
+        seen.add(token)
+        tokens.append(token)
+
+
+def _parser(tokens):
+    match tokens:
+        case [_Token.ALPHA, *_]:
+            return lambda string: string
+        case [_Token.DIGIT]:
+            return lambda string: int(string)
+        case [_Token.DIGIT, _Token.DOT]:
+            return lambda string: float(string)
