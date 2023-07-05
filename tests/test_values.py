@@ -144,7 +144,9 @@ def test_mean_time():
 def test_infer():
     tests = [['ab', 'ab'],
              ['1', 1],
-             ['1.0', 1.0]]
+             ['1.0', 1.0],
+             ['1 2 3', [1, 2, 3]],
+             ['1 2.5 3', [1, 2.5, 3]]]
 
     for inp, out in tests:
         result = infer(inp)

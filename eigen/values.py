@@ -2,7 +2,7 @@ from functools import partial
 from pathlib import PurePath
 from zipfile import ZipFile
 import timeit
-from enum import Enum
+from enum import IntEnum
 
 
 def apply_function(function, values):
@@ -77,7 +77,7 @@ def infer(string):
     return parse(string)
 
 
-_Token = Enum('_Token', ['DIGIT', 'ALPHA', 'DOT'])
+_Token = IntEnum('_Token', ['ALPHA', 'DIGIT', 'DOT', 'SPACE'])
 
 
 def _tokens(string):
@@ -90,7 +90,9 @@ def _tokens(string):
             _append_if_first(seen, tokens, _Token.DOT)
         elif c.isalpha():
             _append_if_first(seen, tokens, _Token.ALPHA)
-    return tokens
+        elif c.isspace():
+            _append_if_first(seen, tokens, _Token.SPACE)
+    return sorted(tokens)
 
 
 def _append_if_first(seen, tokens, token):
@@ -100,6 +102,7 @@ def _append_if_first(seen, tokens, token):
 
 
 def _parser(tokens):
+    print(tokens)
     match tokens:
         case [_Token.ALPHA, *_]:
             return lambda string: string
@@ -107,3 +110,6 @@ def _parser(tokens):
             return lambda string: int(string)
         case [_Token.DIGIT, _Token.DOT]:
             return lambda string: float(string)
+        case [_Token.DIGIT, _Token.SPACE] | \
+                [_Token.DIGIT, _Token.DOT, _Token.SPACE]:
+            return lambda string: [infer(s) for s in string.split()]
