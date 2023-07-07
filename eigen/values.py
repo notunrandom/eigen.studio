@@ -72,7 +72,11 @@ def _convert(data):
     return data
 
 
-def infer(string):
+def infer(strings):
+    return list(map(_infer, strings))
+
+
+def _infer(string):
     parse = _parser(_tokens(string))
     return parse(string)
 
@@ -112,4 +116,4 @@ def _parser(tokens):
             return lambda string: float(string)
         case [_Token.DIGIT, _Token.SPACE] | \
                 [_Token.DIGIT, _Token.DOT, _Token.SPACE]:
-            return lambda string: [infer(s) for s in string.split()]
+            return lambda string: [_infer(s) for s in string.split()]
