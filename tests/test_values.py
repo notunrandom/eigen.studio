@@ -9,53 +9,68 @@ from eigen.values import print_differences
 from eigen.values import infer
 
 
-def randint():
+def _randint():
     return random.randint(-9999999, 9999999)
 
 
-key = randint()
-yek = 10000000
-
-
-def constant():
-    return key
-
-
 def test_apply_zero_args():
-    assert apply_function(constant, [key]) == [key]
-    assert apply_function(constant, [yek]) == [key]
+    """Show that apply_function can be passed a 0-argument function.
+    It must also be passed a list with an (unused) expected value.
+    It returns a single-element list which contains the return value.
+    """
 
+    KEY = _randint()
+    YEK = 10000000
 
-def add_one(x):
-    return x + 1
+    def constant():
+        return KEY
+
+    assert apply_function(constant, [KEY]) == [KEY]
+    assert apply_function(constant, [YEK]) == [KEY]
 
 
 def test_apply_one_arg():
-    x = randint()
+    """Show that apply_function can be passed a 1-argument function.
+    It must also be passed a list with the argument and an (unused)
+    expected value. It returns a list with the argument and the
+    returned value.
+    """
+
+    def add_one(x):
+        return x + 1
+
+    x = _randint()
     y = x + 1
     z = x - 1
+
     assert apply_function(add_one, [x, y]) == [x, y]
     assert apply_function(add_one, [x, z]) == [x, y]
 
 
-def mysum(x, y):
+def _mysum(x, y):
     return x + y
 
 
 def test_apply_two_args():
-    x = randint()
-    y = randint()
+    """Show that apply_function can be passed a 2-argument function.
+    It must also be passed a list with the arguments and an (unused)
+    expected value. It returns a list with the arguments and the
+    returned value.
+    """
+
+    x = _randint()
+    y = _randint()
     ok = x + y
     ko = x + y + 1
-    assert apply_function(mysum, [x, y, ok]) == [x, y, ok]
-    assert apply_function(mysum, [x, y, ko]) == [x, y, ok]
+    assert apply_function(_mysum, [x, y, ok]) == [x, y, ok]
+    assert apply_function(_mysum, [x, y, ko]) == [x, y, ok]
 
 
 def test_differences():
     table = [[1, 2, 3], [12, -5, 7], [30, 0, 30]]
-    assert differences(mysum, table) == []
+    assert differences(_mysum, table) == []
     table[1] = [12, -5, 0]
-    assert differences(mysum, table) == [[12, -5, 7]]
+    assert differences(_mysum, table) == [[12, -5, 7]]
 
 
 def test_print_differences():
@@ -113,27 +128,32 @@ def test_HMDNA_bad_zip():
     assert tests2 == tests1
 
 
-def fut1(xs):
-    return list(reversed(xs))
-
-
-def fut2(xs):
-    rev = list(reversed(xs))
-    inc = [x + 1 for x in rev]
-    inc.reverse()
-    dec = [x - 1 for x in inc]
-    return list(reversed(dec))
-
-
-def fut3(xs):
-    return xs
-
-
 def test_mean_time():
+    """Show that mean_time is different for a correct and inefficient
+    implementation, but raises an exception for an incorrect one.
+    """
+
+    def fut1(xs):
+        """Normal implementation of list reversal."""
+        return list(reversed(xs))
+
+    def fut2(xs):
+        """Really inefficient implementation of list reversal."""
+        rev = list(reversed(xs))
+        inc = [x + 1 for x in rev]
+        inc.reverse()
+        dec = [x - 1 for x in inc]
+        return list(reversed(dec))
+
+    def fut3(xs):
+        """Incorrect implementation of list reversal."""
+        return xs
+
     table = [
         [[1], [1]],
         [[1, 2, 3], [3, 2, 1]],
         [list(range(1, 1000)), list(range(999, 0, -1))]]
+
     time1 = mean_time(fut1, table)
     time2 = mean_time(fut2, table)
     assert time2 > 2*time1
@@ -151,4 +171,4 @@ def test_infer():
 
     for inp, out in tests:
         result = infer(inp)
-        assert result == out and type(result) == type(out)
+        assert result == out and type(result) is type(out)

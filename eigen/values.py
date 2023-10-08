@@ -5,7 +5,13 @@ import timeit
 from enum import IntEnum
 
 
-def apply_function(function, values):
+def apply_function(function: callable, values: list) -> list:
+    """Apply the given function to the input values.
+
+    function: a callable taking n-1 arguments.
+    values: a list with n-1 input values and one expected output value.
+    returns: the same input values followed by the actual output value.
+    """
     f = function
     *args, value = values
     for arg in args:
@@ -13,12 +19,23 @@ def apply_function(function, values):
     return args + [f()]
 
 
-def differences(function, table):
+def differences(function: callable, table: list) -> list:
+    """Differences between the truth table and the image.
+
+    function: a callable taking n-1 arguments.
+    table: a truth table, i.e. each row is a list of values (n-1 inputs
+    followed by the expected result.
+    returns: the differences between the truth table and the actual
+    image of applying the function.
+    """
+
     image = [apply_function(function, values) for values in table]
     return [values for values in image if values not in table]
 
 
 def print_differences(differences, values):
+    """Pretty-print differences between a truth table and image."""
+
     ndif = len(differences)
     nval = len(values)
     result = f'{ndif} difference(s) given {nval} value(s).\n'
@@ -38,6 +55,8 @@ def print_differences(differences, values):
 
 
 def mean_time(function, table):
+    """If function is correct, compute mean execution time."""
+
     def ensure_no_differences():
         assert differences(function, table) == []
     n, s = timeit.Timer(ensure_no_differences).autorange()
@@ -45,6 +64,10 @@ def mean_time(function, table):
 
 
 def value_table_from_HMDNA_zip(path):
+    """Read test files .zip provided with exercises in the 'Hidden
+    messages in DNA' course in bioinformatics (on Coursera).
+    """
+
     path = PurePath(path)
     tests = []
     with ZipFile(path) as zfile:
