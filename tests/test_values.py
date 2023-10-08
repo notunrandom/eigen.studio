@@ -1,5 +1,6 @@
 import random
 import pytest
+from pandas.core.common import flatten
 
 from eigen.values import apply_function
 from eigen.values import differences
@@ -171,4 +172,6 @@ def test_infer():
 
     for inp, out in tests:
         result = infer(inp)
-        assert result == out and type(result) is type(out)
+        assert result == out
+        zipflat = zip(flatten(result), flatten(out))
+        assert all([type(x) is type(y) for x, y in zipflat])
