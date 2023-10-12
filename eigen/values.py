@@ -1,4 +1,5 @@
 from functools import partial
+from functools import reduce
 from pathlib import PurePath
 from zipfile import ZipFile
 import timeit
@@ -82,9 +83,9 @@ def value_table_from_HMDNA_zip(path):
             with zfile.open(f) as file:
                 for line in file:
                     test.append(line)
-            test = [t.decode('UTF-8').strip() for t in test]
-            tests.append(_convert(test))
-    return (path.stem, tests)
+            test = [t.decode('UTF-8').strip().split() for t in test]
+            tests.append([_convert(t) for t in test])
+    return (path.stem, _normalise(tests))
 
 
 def _convert(data):
@@ -92,3 +93,18 @@ def _convert(data):
         if data[i].isdigit():
             data[i] = int(data[i])
     return data
+
+
+def _normalise(lists):
+
+    def max_lengths(lengths, lists):
+        return [max(acc, len(item)) for acc, item in zip(lengths, lists)]
+
+    lengths = reduce(max_lengths, lists, [0 for _ in lists[0]])
+    norm = []
+    for item in lists:
+        n = []
+        for item, length in zip(item, lengths):
+            n.append(item if length > 1 else item[0])
+        norm.append(n)
+    return norm
