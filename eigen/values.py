@@ -2,7 +2,6 @@ from functools import partial
 from pathlib import PurePath
 from zipfile import ZipFile
 import timeit
-from enum import IntEnum
 
 
 def apply_function(function: callable, values: list) -> list:
@@ -93,50 +92,3 @@ def _convert(data):
         if data[i].isdigit():
             data[i] = int(data[i])
     return data
-
-
-def infer(strings):
-    return list(map(_infer, strings))
-
-
-def _infer(string):
-    parse = _parser(_tokens(string))
-    return parse(string)
-
-
-_Token = IntEnum('_Token', ['ALPHA', 'DIGIT', 'DOT', 'SPACE'])
-
-
-def _tokens(string):
-    seen = set()
-    tokens = list()
-    for c in string:
-        if c.isdigit():
-            _append_if_first(seen, tokens, _Token.DIGIT)
-        elif c == '.':
-            _append_if_first(seen, tokens, _Token.DOT)
-        elif c.isalpha():
-            _append_if_first(seen, tokens, _Token.ALPHA)
-        elif c.isspace():
-            _append_if_first(seen, tokens, _Token.SPACE)
-    return sorted(tokens)
-
-
-def _append_if_first(seen, tokens, token):
-    if token not in seen:
-        seen.add(token)
-        tokens.append(token)
-
-
-def _parser(tokens):
-    print(tokens)
-    match tokens:
-        case [_Token.ALPHA, *_]:
-            return lambda string: string
-        case [_Token.DIGIT]:
-            return lambda string: int(string)
-        case [_Token.DIGIT, _Token.DOT]:
-            return lambda string: float(string)
-        case [_Token.DIGIT, _Token.SPACE] | \
-                [_Token.DIGIT, _Token.DOT, _Token.SPACE]:
-            return lambda string: [_infer(s) for s in string.split()]
