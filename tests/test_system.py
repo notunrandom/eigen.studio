@@ -3,13 +3,13 @@ from eigen.system import inconsistencies
 
 def test_inconsistencies_empty_system():
 
-    system = ('empty', [])
+    system = ('empty', dict())
     assert list(inconsistencies({}, system)) == []
 
 
 def test_inconsistencies_none():
     addition = ('add', [[13, 17, 30]])
-    system = ('arithmetic', [addition])
+    system = ('arithmetic', dict([addition]))
 
     def myadd(x, y):
         return x + y
@@ -23,7 +23,7 @@ def test_inconsistencies():
     subtraction = ('subtract', [[5, 1, 4], [13, 17, -4]])
     multiplication = ('multiply', [[5, 1, 5], [13, 17, 221]])
     other = ('other', [[1, 6, 99], [12, 12, 12]])
-    system = ('arithmetic', [addition, subtraction, multiplication, other])
+    system = ('arithmetic', dict([addition, subtraction, multiplication, other]))
 
     def badadd(x, _):
         return x + 1

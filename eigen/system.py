@@ -3,7 +3,7 @@ import eigen.values
 
 def inconsistencies(functions, system):
     _, tables = system
-    for name, table in tables:
+    for name, table in tables.items():
         if name not in functions.keys():
             for values in table:
                 *args, result = values
