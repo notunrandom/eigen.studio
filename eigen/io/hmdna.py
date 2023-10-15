@@ -1,10 +1,24 @@
 from functools import reduce
-from pathlib import PurePath
+from pathlib import PurePath, Path
 from zipfile import ZipFile
 
 
+def system(pathstr):
+    """Read all tests from all .zip files in a directory of .zip files
+    provided with exercises in the 'Hidden messages in DNA' course in
+    bioinformatics (on Coursera)."""
+
+    path = Path(pathstr)
+    sysname = path.stem
+    tables = dict()
+    for p in Path(path).glob('**/*.zip'):
+        name, table = unzip(p)
+        tables[name] = table
+    return (sysname, tables)
+
+
 def unzip(path):
-    """Read test files .zip provided with exercises in the 'Hidden
+    """Read test files from .zip provided with exercises in the 'Hidden
     messages in DNA' course in bioinformatics (on Coursera).
     """
 

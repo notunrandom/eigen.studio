@@ -23,7 +23,8 @@ def test_inconsistencies():
     subtraction = ('subtract', [[5, 1, 4], [13, 17, -4]])
     multiplication = ('multiply', [[5, 1, 5], [13, 17, 221]])
     other = ('other', [[1, 6, 99], [12, 12, 12]])
-    system = ('arithmetic', dict([addition, subtraction, multiplication, other]))
+    values = dict([addition, subtraction, multiplication, other])
+    system = ('arithmetic', values)
 
     def badadd(x, _):
         return x + 1
