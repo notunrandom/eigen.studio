@@ -2,6 +2,16 @@ from functools import partial
 import timeit
 
 
+def inconsistencies(function, table):
+    for *args, expected in table:
+        f = function
+        for arg in args:
+            f = partial(f, arg)
+        image = f()
+        if image != expected:
+            yield args + [(expected, image)]
+
+
 def apply_function(function: callable, values: list) -> list:
     """Apply the given function to the input values.
 
