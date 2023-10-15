@@ -2,7 +2,7 @@ import pytest
 
 from eigen.values import inconsistencies
 from eigen.values import mean_time
-from eigen.values import print_differences
+from eigen.values import print_inconsistencies
 
 
 def test_inconsistencies_1_arg():
@@ -27,33 +27,29 @@ def test_inconsistencies_2_args():
     assert list(inconsistencies(mysum, table)) == [[12, -5, (0, 7)]]
 
 
-def test_print_differences():
-    assert print_differences([], [[1, 2, 3]]) \
-        == '0 difference(s) given 1 value(s).\n'
-    assert print_differences([], [[1, 2, 3], [2, 3, 5]]) \
-        == '0 difference(s) given 2 value(s).\n'
-    assert print_differences([[1, 2, 0]], [[1, 2, 3]]) == (
-            '1 difference(s) given 1 value(s).\n'
+def test_print_inconsistencies():
+    assert print_inconsistencies([]) == 'Total inconsistencies: 0.\n'
+    assert print_inconsistencies([[1, 2, (3, 0)]]) == (
+            'Total inconsistencies: 1.\n'
             '\n'
-            'Difference: 1\n'
+            'Inconsistency: 1\n'
             'Argument 1: 1\n'
             'Argument 2: 2\n'
             'Specified:  3\n'
             'Computed:   0\n'
             )
-    difs = [['foo', 3, 1, 'ooo'], ['baz', 2, 1, 'aaa']]
-    vals = [['foo', 3, 1, 'fff'], ['bar', 1, 1, 'b'], ['baz', 2, 1, 'bb']]
-    assert print_differences(difs, vals) == (
-            '2 difference(s) given 3 value(s).\n'
+    incs = [['foo', 3, 1, ('fff', 'ooo')], ['baz', 2, 1, ('bb', 'aaa')]]
+    assert print_inconsistencies(incs) == (
+            'Total inconsistencies: 2.\n'
             '\n'
-            'Difference: 1\n'
+            'Inconsistency: 1\n'
             'Argument 1: foo\n'
             'Argument 2: 3\n'
             'Argument 3: 1\n'
             'Specified:  fff\n'
             'Computed:   ooo\n'
             '\n'
-            'Difference: 2\n'
+            'Inconsistency: 2\n'
             'Argument 1: baz\n'
             'Argument 2: 2\n'
             'Argument 3: 1\n'
