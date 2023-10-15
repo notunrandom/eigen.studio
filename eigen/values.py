@@ -15,18 +15,19 @@ def inconsistencies(function, table):
 def print_inconsistencies(incs):
     """Pretty-print result of inconsistencies()."""
 
-    total = len(incs)
-    result = f'Total inconsistencies: {total}.\n'
-    for i in range(total):
+    result = ''
+    i = 0
+    for inc in incs:
         result += f'\nInconsistency: {i+1}\n'
-        inc = incs[i]
         narg = len(inc) - 1
         for j in range(narg):
             result += f'Argument {j+1}: {inc[j]}\n'
         spec, comp = inc[-1]
         result += f'Specified:  {spec}\n'
         result += f'Computed:   {comp}\n'
-    return result
+        i += 1
+
+    return f'Total inconsistencies: {i}.\n' + result
 
 
 def mean_time(function, table):

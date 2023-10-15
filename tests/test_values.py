@@ -58,6 +58,18 @@ def test_print_inconsistencies():
             )
 
 
+def test_print_inconsistencies_gen():
+    """print_inconsistencies can be passed the generator directly."""
+
+    def myfun(x):
+        return x
+
+    table = [[1, 1], ['yo', 'yo'], ['ho', 'blah']]
+    prnt = print_inconsistencies(inconsistencies(myfun, table))
+#    assert 'Total inconsistencies' in prnt
+    assert 'Specified:  blah' in prnt
+
+
 def test_mean_time():
     """Show that mean_time is different for a correct and inefficient
     implementation, but raises an exception for an incorrect one.
