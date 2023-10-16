@@ -1,4 +1,5 @@
 from eigen.system import inconsistencies
+from eigen.system import solution, solutions
 
 
 def test_inconsistencies_empty_system():
@@ -43,3 +44,22 @@ def test_inconsistencies():
     assert ('subtract', [13, 17, (-4, 12)]) in result
     assert ('other', [1, 6, (99, None)]) in result
     assert ('other', [12, 12, (12, None)]) in result
+
+
+@solution('mytestsystem', __name__, 'fun1')
+def myfun1(string):
+    return 2 * string
+
+
+@solution('mytestsystem', __name__, 'fun2')
+def myfun2(x, y):
+    return x * y
+
+
+def test_solution():
+    system = ('mytestsystem',
+              {'fun1': [['yo', 'yoyo'], ['xyz', 'xyzxyz']],
+               'fun2': [[1, 2, 2], [3, 7, 21], [0, 31, 0]]})
+    solns = solutions('mytestsystem')
+    assert len(solns) == 1
+    assert list(inconsistencies(solns[__name__], system)) == []
