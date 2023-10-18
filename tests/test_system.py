@@ -1,4 +1,5 @@
 from eigen.system import solve
+from eigen.system import solves
 from eigen.system import solution
 from eigen.system import solutions
 
@@ -51,17 +52,17 @@ def test_solve_some():
     assert unsolved['other'] == {}
 
 
-@solution(lambda _: ('mytestsystem', 'fun1'))
+@solves('mytestsystem', 'fun1')
 def myfun1(string):
     return 2 * string
 
 
-@solution(lambda _: ('mytestsystem', 'fun2'))
+@solves('mytestsystem', 'fun2')
 def myfun2(x, y):
     return x * y
 
 
-def test_solution():
+def test_solves():
     system = {'fun1': [['yo', 'yoyo'], ['xyz', 'xyzxyz']],
               'fun2': [[1, 2, 2], [3, 7, 21], [0, 31, 0]]}
     sol = solutions('mytestsystem')
@@ -70,17 +71,17 @@ def test_solution():
     assert solved == {'fun1': {myfun1}, 'fun2': {myfun2}}
 
 
-@solution()
+@solution
 def fun1(x):
     return 3 * x
 
 
-@solution()
+@solution
 def fun2(x, y):
     return x + y
 
 
-def test_implicit_solution():
+def test_solution():
     system = {'fun1': [['yo', 'yoyoyo'], [7, 21]],
               'fun2': [[1, 2, 3], [3, 7, 10], [0, 31, 31]]}
     sol = solutions(__name__)

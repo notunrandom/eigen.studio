@@ -28,12 +28,16 @@ def matchfun(func):
     return (func.__module__, func.__name__)
 
 
-def solution(match=matchfun):
-    def solution_decorator(func):
-        (sys, fname) = match(func)
-        _register[sys][fname].add(func)
+def solution(func):
+    _register[func.__module__][func.__name__].add(func)
+    return func
+
+
+def solves(system, function):
+    def decorator(func):
+        _register[system][function].add(func)
         return func
-    return solution_decorator
+    return decorator
 
 
 def solutions(sys):
