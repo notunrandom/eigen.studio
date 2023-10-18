@@ -2,28 +2,39 @@ from collections import defaultdict
 
 import eigen.values
 
-_register = defaultdict(lambda: defaultdict(dict))
+_register = defaultdict(lambda: defaultdict(set))
 
 
-def inconsistencies(functions, system):
-    _, tables = system
+def solve(tables, functions):
+    solved = defaultdict(set)
+    unsolved = defaultdict(lambda: defaultdict(list))
+
     for name, table in tables.items():
         if name not in functions.keys():
             for values in table:
                 *args, result = values
-                yield (name, args + [(result, None)])
+                unsolved[name]
         else:
-            function = functions[name]
-            for inc in eigen.values.inconsistencies(function, table):
-                yield (name, inc)
+            for f in functions[name]:
+                for i in eigen.values.inconsistencies(f, table):
+                    unsolved[name][f].append(i)
+            if name not in unsolved.keys() or f not in unsolved[name].keys():
+                solved[name].add(f)
+
+    return (solved, unsolved)
 
 
-def solution(system_name, solution_name, function_name):
+def matchfun(func):
+    return (func.__module__, func.__name__)
+
+
+def solution(match=matchfun):
     def solution_decorator(func):
-        _register[system_name][solution_name][function_name] = func
+        (sys, fname) = match(func)
+        _register[sys][fname].add(func)
         return func
     return solution_decorator
 
 
-def solutions(system_name):
-    return _register[system_name]
+def solutions(sys):
+    return _register[sys]

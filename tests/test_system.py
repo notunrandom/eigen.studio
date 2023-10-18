@@ -1,31 +1,36 @@
-from eigen.system import inconsistencies
-from eigen.system import solution, solutions
+from eigen.system import solve
+from eigen.system import solution
+from eigen.system import solutions
 
 
-def test_inconsistencies_empty_system():
+def test_solve_empty_system():
+    system = {}
+    solution = {}
+    (solved, unsolved) = solve(system, solution)
+    assert solved == unsolved == {}
 
-    system = ('empty', dict())
-    assert list(inconsistencies({}, system)) == []
 
+def test_solve_all():
 
-def test_inconsistencies_none():
-    addition = ('add', [[13, 17, 30]])
-    system = ('arithmetic', dict([addition]))
+    system = {'add': [[13, 17, 30]]}
 
     def myadd(x, y):
         return x + y
 
-    solution = {'add': myadd}
-    assert list(inconsistencies(solution, system)) == []
+    solution = {'add': {myadd}}
+    (solved, unsolved) = solve(system, solution)
+
+    assert unsolved == {}
+    assert solved == {'add': {myadd}}
 
 
-def test_inconsistencies():
+def test_solve_some():
+
     addition = ('add', [[5, 1, 6], [13, 17, 30]])
     subtraction = ('subtract', [[5, 1, 4], [13, 17, -4]])
     multiplication = ('multiply', [[5, 1, 5], [13, 17, 221]])
     other = ('other', [[1, 6, 99], [12, 12, 12]])
-    values = dict([addition, subtraction, multiplication, other])
-    system = ('arithmetic', values)
+    system = dict([addition, subtraction, multiplication, other])
 
     def badadd(x, _):
         return x + 1
@@ -36,30 +41,49 @@ def test_inconsistencies():
     def mymult(x, y):
         return x * y
 
-    solution = {'add': badadd, 'subtract': badsub, 'multiply': mymult}
+    solution = {'add': {badadd}, 'subtract': {badsub}, 'multiply': {mymult}}
+    (solved, unsolved) = solve(system, solution)
 
-    result = list(inconsistencies(solution, system))
-    assert len(result) == 4
-    assert ('add', [13, 17, (30, 14)]) in result
-    assert ('subtract', [13, 17, (-4, 12)]) in result
-    assert ('other', [1, 6, (99, None)]) in result
-    assert ('other', [12, 12, (12, None)]) in result
+    assert solved == {'multiply': {mymult}}
+    assert len(unsolved) == 3
+    assert unsolved['add'] == {badadd: [[13, 17, (30, 14)]]}
+    assert unsolved['subtract'] == {badsub: [[13, 17, (-4, 12)]]}
+    assert unsolved['other'] == {}
 
 
-@solution('mytestsystem', __name__, 'fun1')
+@solution(lambda _: ('mytestsystem', 'fun1'))
 def myfun1(string):
     return 2 * string
 
 
-@solution('mytestsystem', __name__, 'fun2')
+@solution(lambda _: ('mytestsystem', 'fun2'))
 def myfun2(x, y):
     return x * y
 
 
 def test_solution():
-    system = ('mytestsystem',
-              {'fun1': [['yo', 'yoyo'], ['xyz', 'xyzxyz']],
-               'fun2': [[1, 2, 2], [3, 7, 21], [0, 31, 0]]})
-    solns = solutions('mytestsystem')
-    assert len(solns) == 1
-    assert list(inconsistencies(solns[__name__], system)) == []
+    system = {'fun1': [['yo', 'yoyo'], ['xyz', 'xyzxyz']],
+              'fun2': [[1, 2, 2], [3, 7, 21], [0, 31, 0]]}
+    sol = solutions('mytestsystem')
+    (solved, unsolved) = solve(system, sol)
+    assert unsolved == {}
+    assert solved == {'fun1': {myfun1}, 'fun2': {myfun2}}
+
+
+@solution()
+def fun1(x):
+    return 3 * x
+
+
+@solution()
+def fun2(x, y):
+    return x + y
+
+
+def test_implicit_solution():
+    system = {'fun1': [['yo', 'yoyoyo'], [7, 21]],
+              'fun2': [[1, 2, 3], [3, 7, 10], [0, 31, 31]]}
+    sol = solutions(__name__)
+    (solved, unsolved) = solve(system, sol)
+    assert unsolved == {}
+    assert solved == {'fun1': {fun1}, 'fun2': {fun2}}
