@@ -2,6 +2,8 @@ from eigen.system import solve
 from eigen.system import solves
 from eigen.system import solution
 from eigen.system import solutions
+from eigen.system import match
+import my_system
 
 
 def test_solve_empty_system():
@@ -88,3 +90,16 @@ def test_solution():
     (solved, unsolved) = solve(system, sol)
     assert unsolved == {}
     assert solved == {'fun1': {fun1}, 'fun2': {fun2}}
+
+
+def test_match_easy():
+    systems = {'my_system': {'my_abc': [[1, 2]], 'my_xyz': [['foo', 'oof']]},
+               'other': {'foo': [[1, 2]], 'bar': [[2, 1]]}}
+    name, system, solution = match(systems, my_system)
+    assert name == 'my_system'
+    assert system == systems['my_system']
+    assert solution == {'my_abc': {my_system.my_abc},
+                        'my_xyz': {my_system.my_xyz}}
+    solved, unsolved = solve(system, solution)
+    assert unsolved == {}
+    assert solved == solution

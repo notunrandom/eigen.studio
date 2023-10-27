@@ -1,4 +1,5 @@
 from collections import defaultdict
+from inspect import getmembers, isfunction
 
 import eigen.values
 
@@ -42,3 +43,12 @@ def solves(system, function):
 
 def solutions(sys):
     return _register[sys]
+
+
+def match(systems, module):
+    system = systems[module.__name__]
+    solution = defaultdict(set)
+    for name, _ in system.items():
+        solution[name] = {dict(getmembers(module, isfunction))[name]}
+
+    return (module.__name__, system, solution)
