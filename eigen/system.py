@@ -1,5 +1,5 @@
 from collections import defaultdict
-from inspect import getmembers, isfunction
+from inspect import getmembers, isfunction, getfullargspec
 
 import eigen.values
 
@@ -48,7 +48,12 @@ def solutions(sys):
 def match(systems, module):
     system = systems[module.__name__]
     solution = defaultdict(set)
-    for name, _ in system.items():
-        solution[name] = {dict(getmembers(module, isfunction))[name]}
+    for name, values in system.items():
+        functions = dict(getmembers(module, isfunction))
+        if name in functions.keys():
+            function = functions[name]
+            arity = len(getfullargspec(function).args)
+            if arity == len(values[0]) - 1:
+                solution[name] = {dict(getmembers(module, isfunction))[name]}
 
     return (module.__name__, system, solution)

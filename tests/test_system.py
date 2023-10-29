@@ -103,3 +103,16 @@ def test_match_easy():
     solved, unsolved = solve(system, solution)
     assert unsolved == {}
     assert solved == solution
+
+
+def test_match_wrong_arity():
+    systems = {'my_system': {'my_abc': [[1, 2]], 'my_xyz': [['yo', 'oy', 3]]},
+               'other': {'foo': [[1, 2]], 'bar': [[2, 1]]}}
+    name, system, solution = match(systems, my_system)
+    assert name == 'my_system'
+    assert system == systems['my_system']
+    assert solution == {'my_abc': {my_system.my_abc}}
+    solved, unsolved = solve(system, solution)
+    assert len(unsolved) == 1
+    assert unsolved['my_xyz'] == {}
+    assert solved == solution
