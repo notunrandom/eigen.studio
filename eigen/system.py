@@ -64,10 +64,12 @@ def norm(string):
     for c in string:
         if ord(c) in range(ord('a'), ord('z') + 1):
             result += c
-        if ord(c) in range(ord('A'), ord('Z') + 1):
+        elif ord(c) in range(ord('A'), ord('Z') + 1):
             if len(result) > 0 and result[-1].islower():
                 result += '_'
             result += c.lower()
+        elif len(result) == 0:
+            continue
         elif c == '_':
             result += c
         elif c in '- ':

@@ -126,7 +126,8 @@ def test_norm():
              ('myName', 'my_name'),
              ('My Name', 'my_name'),
              ('my name', 'my_name'),
-             ('my$name', 'myname')
+             ('my$name', 'myname'),
+             ('03-MyName', 'my_name')
              ]
     for inp, out in tests:
         assert norm(inp) == out
