@@ -46,20 +46,20 @@ def solutions(sys):
 
 
 def match(systems, module):
-    system = systems[module.__name__]
+    system = match_key(systems, module.__name__)
     solution = defaultdict(set)
     for name, values in system.items():
         functions = dict(getmembers(module, isfunction))
-        if name in functions.keys():
-            function = functions[name]
+        function = match_key(functions, name)
+        if function:
             arity = len(getfullargspec(function).args)
             if arity == len(values[0]) - 1:
-                solution[name] = {dict(getmembers(module, isfunction))[name]}
+                solution[name] = {function}
 
-    return (module.__name__, system, solution)
+    return (system, solution)
 
 
-def name(string):
+def norm(string):
     result = str()
     for c in string:
         if ord(c) in range(ord('a'), ord('z') + 1):
@@ -73,3 +73,15 @@ def name(string):
         elif c in '- ':
             result += '_'
     return result
+
+
+def match_key(dict_, name):
+
+    if name in dict_.keys():
+        return dict_[name]
+
+    for key, value in dict_.items():
+        if norm(key) == norm(name):
+            return value
+
+    return None

@@ -3,7 +3,8 @@ from eigen.system import solves
 from eigen.system import solution
 from eigen.system import solutions
 from eigen.system import match
-from eigen.system import name
+from eigen.system import match_key
+from eigen.system import norm
 import my_system
 
 
@@ -96,8 +97,7 @@ def test_solution():
 def test_match_easy():
     systems = {'my_system': {'my_abc': [[1, 2]], 'my_xyz': [['foo', 'oof']]},
                'other': {'foo': [[1, 2]], 'bar': [[2, 1]]}}
-    name, system, solution = match(systems, my_system)
-    assert name == 'my_system'
+    system, solution = match(systems, my_system)
     assert system == systems['my_system']
     assert solution == {'my_abc': {my_system.my_abc},
                         'my_xyz': {my_system.my_xyz}}
@@ -109,8 +109,7 @@ def test_match_easy():
 def test_match_wrong_arity():
     systems = {'my_system': {'my_abc': [[1, 2]], 'my_xyz': [['yo', 'oy', 3]]},
                'other': {'foo': [[1, 2]], 'bar': [[2, 1]]}}
-    name, system, solution = match(systems, my_system)
-    assert name == 'my_system'
+    system, solution = match(systems, my_system)
     assert system == systems['my_system']
     assert solution == {'my_abc': {my_system.my_abc}}
     solved, unsolved = solve(system, solution)
@@ -119,7 +118,7 @@ def test_match_wrong_arity():
     assert solved == solution
 
 
-def test_name():
+def test_norm():
     tests = [('name', 'name'),
              ('name30', 'name'),
              ('my_name', 'my_name'),
@@ -130,4 +129,23 @@ def test_name():
              ('my$name', 'myname')
              ]
     for inp, out in tests:
-        assert name(inp) == out
+        assert norm(inp) == out
+
+
+def test_match_key():
+    d = {'my_a': 1, 'my_b': 2}
+    assert match_key(d, 'my_a') == 1
+    assert match_key(d, 'myA') == 1
+    assert match_key(d, 'myB') == 2
+    assert match_key(d, 'foo') is None
+
+
+def test_match_camel_under():
+    systems = {'MySystem': {'MyAbc': [[1, 2]], 'myXyz': [['yo', 'oy']]}}
+    system, solution = match(systems, my_system)
+    assert system == systems['MySystem']
+    assert solution == {'MyAbc': {my_system.my_abc},
+                        'myXyz': {my_system.my_xyz}}
+    solved, unsolved = solve(system, solution)
+    assert unsolved == {}
+    assert solved == solution
