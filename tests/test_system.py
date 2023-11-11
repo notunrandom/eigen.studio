@@ -3,6 +3,7 @@ from eigen.system import solves
 from eigen.system import solution
 from eigen.system import solutions
 from eigen.system import match
+from eigen.system import name
 import my_system
 
 
@@ -116,3 +117,17 @@ def test_match_wrong_arity():
     assert len(unsolved) == 1
     assert unsolved['my_xyz'] == {}
     assert solved == solution
+
+
+def test_name():
+    tests = [('name', 'name'),
+             ('name30', 'name'),
+             ('my_name', 'my_name'),
+             ('my-name', 'my_name'),
+             ('myName', 'my_name'),
+             ('My Name', 'my_name'),
+             ('my name', 'my_name'),
+             ('my$name', 'myname')
+             ]
+    for inp, out in tests:
+        assert name(inp) == out

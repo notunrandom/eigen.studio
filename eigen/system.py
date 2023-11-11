@@ -57,3 +57,19 @@ def match(systems, module):
                 solution[name] = {dict(getmembers(module, isfunction))[name]}
 
     return (module.__name__, system, solution)
+
+
+def name(string):
+    result = str()
+    for c in string:
+        if ord(c) in range(ord('a'), ord('z') + 1):
+            result += c
+        if ord(c) in range(ord('A'), ord('Z') + 1):
+            if len(result) > 0 and result[-1].islower():
+                result += '_'
+            result += c.lower()
+        elif c == '_':
+            result += c
+        elif c in '- ':
+            result += '_'
+    return result
