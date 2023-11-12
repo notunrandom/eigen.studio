@@ -10,17 +10,15 @@ def solve(tables, functions):
     solved = defaultdict(set)
     unsolved = defaultdict(lambda: defaultdict(list))
 
-    for name, table in tables.items():
-        if name not in functions.keys():
-            for values in table:
-                *args, result = values
-                unsolved[name]
+    for key, table in tables.items():
+        if key not in functions.keys():
+            unsolved[key]
         else:
-            for f in functions[name]:
+            for f in functions[key]:
                 for i in eigen.values.inconsistencies(f, table):
-                    unsolved[name][f].append(i)
-            if name not in unsolved.keys() or f not in unsolved[name].keys():
-                solved[name].add(f)
+                    unsolved[key][f].append(i)
+                if key not in unsolved.keys() or f not in unsolved[key].keys():
+                    solved[key].add(f)
 
     return (solved, unsolved)
 
@@ -46,15 +44,14 @@ def solutions(sys):
 
 
 def match(systems, module):
-    system = match_key(systems, module.__name__)
+    system = list(match_key(systems, module.__name__).values())[0]
+    functions = dict(getmembers(module, isfunction))
     solution = defaultdict(set)
     for name, values in system.items():
-        functions = dict(getmembers(module, isfunction))
-        function = match_key(functions, name)
-        if function:
+        for function in match_key(functions, name).values():
             arity = len(getfullargspec(function).args)
             if arity == len(values[0]) - 1:
-                solution[name] = {function}
+                solution[name].add(function)
 
     return (system, solution)
 
@@ -74,16 +71,8 @@ def norm(string):
             result += c
         elif c in '- ':
             result += '_'
-    return result
+    return result.rstrip('_')
 
 
 def match_key(dict_, name):
-
-    if name in dict_.keys():
-        return dict_[name]
-
-    for key, value in dict_.items():
-        if norm(key) == norm(name):
-            return value
-
-    return None
+    return {k: v for k, v in dict_.items() if norm(k) == norm(name)}

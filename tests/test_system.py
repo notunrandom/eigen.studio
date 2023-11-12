@@ -6,6 +6,7 @@ from eigen.system import match
 from eigen.system import match_key
 from eigen.system import norm
 import my_system
+import my_system_2
 
 
 def test_solve_empty_system():
@@ -121,6 +122,7 @@ def test_match_wrong_arity():
 def test_norm():
     tests = [('name', 'name'),
              ('name30', 'name'),
+             ('name_30', 'name'),
              ('my_name', 'my_name'),
              ('my-name', 'my_name'),
              ('myName', 'my_name'),
@@ -135,10 +137,12 @@ def test_norm():
 
 def test_match_key():
     d = {'my_a': 1, 'my_b': 2}
-    assert match_key(d, 'my_a') == 1
-    assert match_key(d, 'myA') == 1
-    assert match_key(d, 'myB') == 2
-    assert match_key(d, 'foo') is None
+    assert match_key(d, 'my_a')['my_a'] == 1
+    assert match_key(d, 'myA')['my_a'] == 1
+    assert match_key(d, 'myB')['my_b'] == 2
+    assert match_key(d, 'my_a2')['my_a'] == 1
+    assert match_key(d, 'my_a_2')['my_a'] == 1
+    assert match_key(d, 'foo') == {}
 
 
 def test_match_camel_under():
@@ -147,6 +151,18 @@ def test_match_camel_under():
     assert system == systems['MySystem']
     assert solution == {'MyAbc': {my_system.my_abc},
                         'myXyz': {my_system.my_xyz}}
+    solved, unsolved = solve(system, solution)
+    assert unsolved == {}
+    assert solved == solution
+
+
+def test_match_multi():
+    systems = {'my_system': {'my_abc': [[1, 2]], 'my_xyz': [['foo', 'oof']]},
+               'other': {'foo': [[1, 2]], 'bar': [[2, 1]]}}
+    system, solution = match(systems, my_system_2)
+    assert system == systems['my_system']
+    assert solution == {'my_abc': {my_system_2.my_abc, my_system_2.my_abc_2},
+                        'my_xyz': {my_system_2.my_xyz, my_system_2.my_xyz7}}
     solved, unsolved = solve(system, solution)
     assert unsolved == {}
     assert solved == solution
