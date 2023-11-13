@@ -5,6 +5,7 @@ from eigen.system import solutions
 from eigen.system import match
 from eigen.system import match_key
 from eigen.system import norm
+from eigen.system import compare
 import my_system
 import my_system_2
 
@@ -166,3 +167,17 @@ def test_match_multi():
     solved, unsolved = solve(system, solution)
     assert unsolved == {}
     assert solved == solution
+
+
+def test_compare_multi():
+    system = {'my_abc': [[1, 2]], 'my_xyz': [['foo', 'oof']]}
+    solution = {'my_abc': {my_system_2.my_abc, my_system_2.my_abc_2},
+                'my_xyz': {my_system_2.my_xyz, my_system_2.my_xyz7}}
+    solved, _ = solve(system, solution)
+    compared = compare(system, solved)
+    assert compared.keys() == solved.keys()
+    for k, v in solved.items():
+        assert len(compared[k]) == len(solved[k])
+        for function, time in compared[k]:
+            assert function in solved[k]
+            assert type(time) is float

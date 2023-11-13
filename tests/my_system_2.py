@@ -10,5 +10,5 @@ def my_abc_2(x):
     return x + x
 
 
-def my_xyz7(str_):
-    return str_[::-1]
+def my_xyz7(str_, step=-1):
+    return str_[::step]

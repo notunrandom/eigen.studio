@@ -49,7 +49,10 @@ def match(systems, module):
     solution = defaultdict(set)
     for name, values in system.items():
         for function in match_key(functions, name).values():
-            arity = len(getfullargspec(function).args)
+            argspec = getfullargspec(function)
+            arity = len(argspec.args)
+            if argspec.defaults is not None:
+                arity -= len(argspec.defaults)
             if arity == len(values[0]) - 1:
                 solution[name].add(function)
 
@@ -76,3 +79,20 @@ def norm(string):
 
 def match_key(dict_, name):
     return {k: v for k, v in dict_.items() if norm(k) == norm(name)}
+
+
+def compare(system, solution):
+
+    def add_time_f(table):
+        def add_time(function):
+            return (function, eigen.values.mean_time(function, table))
+        return add_time
+
+    def time_if_multi(item):
+        key, functions = item
+        if len(functions) > 1:
+            return (key, set(map(add_time_f(system[key]), functions)))
+        else:
+            return (key, functions)
+
+    return dict(map(time_if_multi, solution.items()))
